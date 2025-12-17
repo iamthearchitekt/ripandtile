@@ -258,19 +258,18 @@
     }
 
     .torch {
-      position: fixed;
+      position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      height: 400px;
-      /* Default Desktop */
+      height: 320px;
+      /* Reduced by 20% from 400px */
       transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      /* Smooth resize feel */
       width: auto;
       pointer-events: none;
       mix-blend-mode: normal;
       filter: none;
-      z-index: -1;
-      /* Ensure they stay behind the main content */
+      z-index: 10;
+      /* Above header bg, behind logo if overlap */
 
       /* Robust Luminance Masking (Stencil Luma) */
       -webkit-mask-image: url('MASK.webp');
