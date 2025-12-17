@@ -257,7 +257,9 @@
       top: 50%;
       transform: translateY(-50%);
       height: 400px;
-      /* Increased by ~33% */
+      /* Default Desktop */
+      transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      /* Smooth resize feel */
       width: auto;
       pointer-events: none;
       mix-blend-mode: normal;
@@ -286,8 +288,25 @@
     /* Mobile Optimization */
     @media (max-width: 900px) {
       .torch {
-        display: none;
+        /* On mobile, keep them visible but smaller and at the bottom */
+        display: block;
+        height: 150px;
+        top: auto;
+        bottom: 0;
+        transform: translateY(0);
+        opacity: 0.5;
+        /* Fade them out a bit so they don't distract */
+        pointer-events: none;
       }
+
+      .torch-left {
+        left: -20px;
+      }
+
+      .torch-right {
+        right: -20px;
+      }
+
 
       main {
         padding: 1rem;
@@ -318,10 +337,19 @@
       right: 10%;
     }
 
-    @media (max-width: 1200px) {
+    @media (max-width: 1300px) {
       .torch {
-        display: none;
-        /* Hide on smaller screens to avoid overlap */
+        height: 300px;
+        /* Smaller on laptops */
+        opacity: 0.8;
+      }
+
+      .torch-left {
+        left: 2%;
+      }
+
+      .torch-right {
+        right: 2%;
       }
     }
 
