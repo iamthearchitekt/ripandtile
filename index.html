@@ -285,6 +285,7 @@
           <option value="texture" selected>Wall/Flat Texture</option>
           <option value="sprite">Sprite (Monster/Prop)</option>
           <option value="weapon">Weapon/Hand (HuD)</option>
+          <option value="sky">Skybox (Environment)</option>
         </select>
       </div>
 
@@ -323,7 +324,7 @@
           How to Use</h3>
         <ul
           style="color: var(--text-dim); font-size: 0.8rem; padding-left: 1.2rem; font-family: 'Outfit', sans-serif; line-height: 1.4;">
-          <li>Select your <strong>Asset Type</strong> (Texture, Sprite, Weapon).</li>
+          <li>Select your <strong>Asset Type</strong> (Texture, Skybox, Sprite).</li>
           <li>Drag & Drop any image to convert it.</li>
           <li>Adjust <strong>Dithering</strong> to taste.</li>
           <li><strong>Download</strong> and import directly into SLADE.</li>
@@ -608,6 +609,12 @@
         { value: '128x128', label: 'Wall Standard (128x128)' },
         { value: '256x128', label: 'Wall Wide (256x128)' },
         { value: '64x64', label: 'Flat (Floor/Ceiling) (64x64)' },
+        { value: 'custom', label: 'Custom (Maintain Aspect)' }
+      ],
+      sky: [
+        { value: '256x128', label: 'Standard Sky (256x128)' },
+        { value: '512x128', label: 'Wide Sky (512x128)' },
+        { value: '1024x128', label: 'Panoramic Sky (1024x128)' },
         { value: 'custom', label: 'Custom (Maintain Aspect)' }
       ],
       sprite: [
