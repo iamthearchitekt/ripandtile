@@ -370,7 +370,6 @@
         <label for="ditherMode">Dithering Mode</label>
         <select id="ditherMode">
           <option value="floyd" selected>Floyd-Steinberg (Recommended)</option>
-          <option value="bayer">Bayer 4x4 (Ordered)</option>
           <option value="atkinson">Atkinson (High Contrast)</option>
           <option value="none">None (Posterize)</option>
         </select>
@@ -481,8 +480,6 @@
 
       if (algorithm === 'floyd') {
         floydSteinberg(data, width, height, useTransparency);
-      } else if (algorithm === 'bayer') {
-        bayerDither(data, width, height, useTransparency);
       } else if (algorithm === 'atkinson') {
         atkinsonDither(data, width, height, useTransparency);
       } else {
@@ -560,44 +557,7 @@
       }
     }
 
-    function bayerDither(data, width, height, useTransparency) {
-      // 4x4 Bayer Matrix
-      const bayerMap = [
-        [1, 9, 3, 11],
-        [13, 5, 15, 7],
-        [4, 12, 2, 10],
-        [16, 8, 14, 6]
-      ];
 
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          const idx = (y * width + x) * 4;
-
-          const alpha = data[idx + 3];
-          if (useTransparency && alpha < 128) {
-            data[idx] = 0; data[idx + 1] = 0; data[idx + 2] = 0; data[idx + 3] = 0;
-            continue;
-          }
-
-          // Normalized threshold from 0 to 1 based on map (1-16) then centered around 0
-          // Value range in map is 1..16. We center it: (v - 8.5)
-          const mapValue = bayerMap[y % 4][x % 4];
-          const threshold = (mapValue - 8.5) * 8; // Scale factor adjusts strength
-
-          const oldR = Math.min(255, Math.max(0, data[idx] + threshold));
-          const oldG = Math.min(255, Math.max(0, data[idx + 1] + threshold));
-          const oldB = Math.min(255, Math.max(0, data[idx + 2] + threshold));
-
-          const nearestIdx = findNearestColor(oldR, oldG, oldB);
-          const [newR, newG, newB] = getColor(nearestIdx);
-
-          data[idx] = newR;
-          data[idx + 1] = newG;
-          data[idx + 2] = newB;
-          data[idx + 3] = 255;
-        }
-      }
-    }
 
     function atkinsonDither(data, width, height, useTransparency) {
       for (let y = 0; y < height; y++) {
