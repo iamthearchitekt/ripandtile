@@ -272,6 +272,33 @@
       mask-mode: luminance;
     }
 
+    /* Mobile Optimization */
+    @media (max-width: 900px) {
+      .torch {
+        display: none;
+      }
+
+      main {
+        padding: 1rem;
+        gap: 1.5rem;
+      }
+
+      .panel {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .controls-panel {
+        align-items: stretch;
+      }
+
+      .drop-zone {
+        padding: 2rem 1rem;
+      }
+    }
+
     .torch-left {
       left: 10%;
     }
