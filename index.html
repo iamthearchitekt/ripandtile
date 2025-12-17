@@ -692,10 +692,12 @@
     outputSizeSelect.addEventListener('change', processImage);
     ditherModeSelect.addEventListener('change', processImage);
 
+    // Performance optimization: Update text immediately, but process image only on release
     ditherAmountInput.addEventListener('input', (e) => {
       ditherAmountVal.textContent = e.target.value;
-      processImage();
     });
+
+    ditherAmountInput.addEventListener('change', processImage);
 
     downloadBtn.addEventListener('click', () => {
       if (!currentImage) return;
