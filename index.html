@@ -53,11 +53,13 @@
 
     header {
       padding: 2rem;
-      text-align: center;
-      position: relative;
-      background: transparent;
-      backdrop-filter: none;
+      /* background and blur removed */
       border-bottom: none;
+      /* Ensure header is positioned for absolute children */
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .logo {
@@ -343,11 +345,11 @@
 
     header {
       position: relative;
-      /* Context for torches */
       display: flex;
       justify-content: center;
       align-items: center;
     }
+
 
 
     .torch-right {
