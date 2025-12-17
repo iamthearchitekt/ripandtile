@@ -141,145 +141,158 @@
     option {
       background-color: #1a1a1a;
       color: white;
-    }
 
-    select:hover {
-      border-color: var(--accent);
-      color: #ff0000;
-    }
-
-    .drop-zone {
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 3rem 1rem;
-      text-align: center;
-      transition: all 0.3s;
-      cursor: pointer;
-      background: rgba(255, 255, 255, 0.05);
-      position: relative;
-      font-family: 'Outfit', sans-serif;
-      letter-spacing: 0;
-      font-size: 0.9rem;
-    }
-
-    .drop-zone:hover,
-    .drop-zone.dragover {
-      border-color: var(--accent);
-      background: rgba(255, 71, 71, 0.15);
-    }
-
-    .button {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 1rem;
-      border-radius: 8px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      cursor: pointer;
-      transition: transform 0.1s, filter 0.2s;
-    }
-
-    .button:hover {
-      filter: brightness(1.2);
-    }
-
-    .button:active {
-      transform: scale(0.98);
-    }
-
-    .preview-panel {
-      flex: 2;
-      min-width: 400px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      background: repeating-linear-gradient(45deg,
-          rgba(0, 0, 0, 0.2),
-          rgba(0, 0, 0, 0.2) 10px,
-          rgba(0, 0, 0, 0.3) 10px,
-          rgba(0, 0, 0, 0.3) 20px);
-      position: relative;
-      overflow: hidden;
-    }
-
-    canvas {
-      max-width: 100%;
-      max-height: 60vh;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-      image-rendering: pixelated;
-    }
-
-    #idleAnimation {
-      max-height: 250px;
-      width: auto;
-      object-fit: contain;
-      margin-bottom: 1rem;
-      filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.3));
-    }
-
-    .file-info {
-      margin-top: 1rem;
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      font-family: 'Outfit', sans-serif;
-      letter-spacing: 0;
-    }
-
-    .torch {
-      position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      height: 400px;
-      /* Increased by ~33% */
-      width: auto;
-      pointer-events: none;
-      mix-blend-mode: normal;
-      filter: none;
-
-      /* Robust Luminance Masking (Stencil Luma) */
-      -webkit-mask-image: url('MASK.webp');
-      mask-image: url('MASK.webp');
-
-      -webkit-mask-size: contain;
-      mask-size: contain;
-
-      -webkit-mask-repeat: no-repeat;
-      mask-repeat: no-repeat;
-
-      -webkit-mask-position: center;
-      mask-position: center;
-
-      /* Luma mode: White = Opaque, Black = Transparent */
-      -webkit-mask-source-type: luminance;
-      mask-mode: luminance;
-    }
-
-    .torch-left {
-      left: 10%;
-    }
-
-    .torch-right {
-      right: 10%;
-    }
-
-    @media (max-width: 1200px) {
-      .torch {
-        display: none;
-        /* Hide on smaller screens to avoid overlap */
+      /* Red Focus State */
+      select:focus,
+      input[type="file"]:focus {
+        outline: none;
+        border-color: #ff0000;
+        box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.4);
       }
-    }
 
-    /* Final Clean Animation Settings - Override to ensure visibility */
-    .torch {
-      mix-blend-mode: normal !important;
-      -webkit-mask-image: none !important;
-      mask-image: none !important;
-      filter: none !important;
-    }
+      /* Red highlight for text selection */
+      ::selection {
+        background: #ff0000;
+        color: white;
+      }
+
+      select:hover {
+        border-color: var(--accent);
+        color: #ff0000;
+      }
+
+      .drop-zone {
+        border: 2px dashed var(--border);
+        border-radius: 12px;
+        padding: 3rem 1rem;
+        text-align: center;
+        transition: all 0.3s;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.05);
+        position: relative;
+        font-family: 'Outfit', sans-serif;
+        letter-spacing: 0;
+        font-size: 0.9rem;
+      }
+
+      .drop-zone:hover,
+      .drop-zone.dragover {
+        border-color: var(--accent);
+        background: rgba(255, 71, 71, 0.15);
+      }
+
+      .button {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 8px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: transform 0.1s, filter 0.2s;
+      }
+
+      .button:hover {
+        filter: brightness(1.2);
+      }
+
+      .button:active {
+        transform: scale(0.98);
+      }
+
+      .preview-panel {
+        flex: 2;
+        min-width: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        background: repeating-linear-gradient(45deg,
+            rgba(0, 0, 0, 0.2),
+            rgba(0, 0, 0, 0.2) 10px,
+            rgba(0, 0, 0, 0.3) 10px,
+            rgba(0, 0, 0, 0.3) 20px);
+        position: relative;
+        overflow: hidden;
+      }
+
+      canvas {
+        max-width: 100%;
+        max-height: 60vh;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        image-rendering: pixelated;
+      }
+
+      #idleAnimation {
+        max-height: 250px;
+        width: auto;
+        object-fit: contain;
+        margin-bottom: 1rem;
+        filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.3));
+      }
+
+      .file-info {
+        margin-top: 1rem;
+        font-size: 0.85rem;
+        color: var(--text-dim);
+        font-family: 'Outfit', sans-serif;
+        letter-spacing: 0;
+      }
+
+      .torch {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 400px;
+        /* Increased by ~33% */
+        width: auto;
+        pointer-events: none;
+        mix-blend-mode: normal;
+        filter: none;
+
+        /* Robust Luminance Masking (Stencil Luma) */
+        -webkit-mask-image: url('MASK.webp');
+        mask-image: url('MASK.webp');
+
+        -webkit-mask-size: contain;
+        mask-size: contain;
+
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+
+        -webkit-mask-position: center;
+        mask-position: center;
+
+        /* Luma mode: White = Opaque, Black = Transparent */
+        -webkit-mask-source-type: luminance;
+        mask-mode: luminance;
+      }
+
+      .torch-left {
+        left: 10%;
+      }
+
+      .torch-right {
+        right: 10%;
+      }
+
+      @media (max-width: 1200px) {
+        .torch {
+          display: none;
+          /* Hide on smaller screens to avoid overlap */
+        }
+      }
+
+      /* Final Clean Animation Settings - Override to ensure visibility */
+      .torch {
+        mix-blend-mode: normal !important;
+        -webkit-mask-image: none !important;
+        mask-image: none !important;
+        filter: none !important;
+      }
   </style>
 </head>
 
