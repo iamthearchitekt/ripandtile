@@ -639,6 +639,24 @@
     const doomguyReset = document.getElementById('doomguyReset');
     const fileInfo = document.getElementById('fileInfo');
 
+    // Sound Effects
+    const SOUNDS = {
+      download: new Audio('DOWNLOAD.mp3'),
+      reset: new Audio('RESET.mp3'),
+      error: new Audio('WRONG FILE.mp3'),
+      assetType: new Audio('ASSET TYPE.mp3'),
+      ditherMode: new Audio('DITHERING MODE.mp3'),
+      outputSize: new Audio('OUTPUT SIZE.mp3'),
+      thresholdStop: new Audio('THRESHOLD STOP.mp3')
+    };
+
+    function playSound(name) {
+      if (SOUNDS[name]) {
+        SOUNDS[name].currentTime = 0;
+        SOUNDS[name].play().catch(e => console.log('Audio play failed:', e));
+      }
+    }
+
     let currentImage = null;
 
     const SIZE_OPTIONS = {
@@ -708,6 +726,7 @@
 
     downloadBtn.addEventListener('click', () => {
       if (!currentImage) return;
+      playSound('download');
       const link = document.createElement('a');
       link.download = `doom_${assetTypeSelect.value}_texture.png`;
       link.href = previewCanvas.toDataURL('image/png');
@@ -732,8 +751,11 @@
 
     function handleFile(file) {
       if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file (PNG or JPG).');
-        return;
+        if (!file.type.startsWith('image/')) {
+          playSound('error');
+          alert('Please upload an image file (PNG or JPG).');
+          return;
+        }
       }
       fileInfo.textContent = `File: ${file.name}`;
       const reader = new FileReader();
@@ -799,6 +821,7 @@
 
     // Reset Logic
     doomguyReset.addEventListener('click', () => {
+      playSound('reset');
       currentImage = null;
       fileInput.value = '';
       fileInfo.textContent = '';
