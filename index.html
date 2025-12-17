@@ -375,6 +375,12 @@
         </select>
       </div>
 
+      <div class="control-group">
+        <label for="ditherAmount">Dithering Threshold (<span id="ditherAmountVal">100</span>%)</label>
+        <input type="range" id="ditherAmount" min="0" max="100" value="100"
+          style="width: 100%; accent-color: var(--accent);">
+      </div>
+
       <button id="downloadBtn" class="button">DOWNLOAD</button>
 
       <div class="instructions" style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1rem;">
@@ -478,10 +484,12 @@
       const imageData = ctx.getImageData(0, 0, width, height);
       const data = imageData.data;
 
+      const amount = parseInt(document.getElementById('ditherAmount').value) / 100;
+
       if (algorithm === 'floyd') {
-        floydSteinberg(data, width, height, useTransparency);
+        floydSteinberg(data, width, height, useTransparency, amount);
       } else if (algorithm === 'atkinson') {
-        atkinsonDither(data, width, height, useTransparency);
+        atkinsonDither(data, width, height, useTransparency, amount);
       } else {
         noDither(data, width, height, useTransparency);
       }
@@ -509,7 +517,7 @@
       }
     }
 
-    function floydSteinberg(data, width, height, useTransparency) {
+    function floydSteinberg(data, width, height, useTransparency, amount = 1.0) {
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
           const idx = (y * width + x) * 4;
@@ -534,9 +542,9 @@
           data[idx + 2] = newB;
           data[idx + 3] = 255;
 
-          const errR = oldR - newR;
-          const errG = oldG - newG;
-          const errB = oldB - newB;
+          const errR = (oldR - newR) * amount;
+          const errG = (oldG - newG) * amount;
+          const errB = (oldB - newB) * amount;
 
           // Distribute
           const distribute = (offset, factor) => {
@@ -559,7 +567,7 @@
 
 
 
-    function atkinsonDither(data, width, height, useTransparency) {
+    function atkinsonDither(data, width, height, useTransparency, amount = 1.0) {
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
           const idx = (y * width + x) * 4;
@@ -582,9 +590,9 @@
           data[idx + 2] = newB;
           data[idx + 3] = 255;
 
-          const errR = oldR - newR;
-          const errG = oldG - newG;
-          const errB = oldB - newB;
+          const errR = (oldR - newR) * amount;
+          const errG = (oldG - newG) * amount;
+          const errB = (oldB - newB) * amount;
 
           const distribute = (offset, factor) => {
             const nIdx = idx + offset;
@@ -613,7 +621,10 @@
     const fileInput = document.getElementById('fileInput');
     const assetTypeSelect = document.getElementById('assetType');
     const outputSizeSelect = document.getElementById('outputSize');
+
     const ditherModeSelect = document.getElementById('ditherMode');
+    const ditherAmountInput = document.getElementById('ditherAmount');
+    const ditherAmountVal = document.getElementById('ditherAmountVal');
     const downloadBtn = document.getElementById('downloadBtn');
     const previewCanvas = document.getElementById('previewCanvas');
     // Initially hide canvas until loaded, show demon instead
@@ -679,7 +690,13 @@
     });
 
     outputSizeSelect.addEventListener('change', processImage);
+    outputSizeSelect.addEventListener('change', processImage);
     ditherModeSelect.addEventListener('change', processImage);
+
+    ditherAmountInput.addEventListener('input', (e) => {
+      ditherAmountVal.textContent = e.target.value;
+      processImage();
+    });
 
     downloadBtn.addEventListener('click', () => {
       if (!currentImage) return;
