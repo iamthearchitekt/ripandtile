@@ -710,19 +710,23 @@
     });
 
     assetTypeSelect.addEventListener('change', () => {
+      playSound('assetType');
       updateSizeOptions();
       processImage();
     });
 
-    outputSizeSelect.addEventListener('change', processImage);
-    ditherModeSelect.addEventListener('change', processImage);
+    outputSizeSelect.addEventListener('change', () => { playSound('outputSize'); processImage(); });
+    ditherModeSelect.addEventListener('change', () => { playSound('ditherMode'); processImage(); });
 
     // Performance optimization: Update text immediately, but process image only on release
     ditherAmountInput.addEventListener('input', (e) => {
       ditherAmountVal.textContent = e.target.value;
     });
 
-    ditherAmountInput.addEventListener('change', processImage);
+    ditherAmountInput.addEventListener('change', () => {
+      playSound('thresholdStop');
+      processImage();
+    });
 
     downloadBtn.addEventListener('click', () => {
       if (!currentImage) return;
