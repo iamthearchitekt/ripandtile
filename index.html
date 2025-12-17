@@ -751,11 +751,9 @@
 
     function handleFile(file) {
       if (!file.type.startsWith('image/')) {
-        if (!file.type.startsWith('image/')) {
-          playSound('error');
-          alert('Please upload an image file (PNG or JPG).');
-          return;
-        }
+        playSound('error');
+        alert('Please upload an image file (PNG or JPG).');
+        return;
       }
       fileInfo.textContent = `File: ${file.name}`;
       const reader = new FileReader();
