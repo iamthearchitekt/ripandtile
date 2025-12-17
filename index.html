@@ -335,8 +335,21 @@
     }
 
     .torch-left {
-      left: 10%;
+      left: 5%;
     }
+
+    .torch-right {
+      right: 5%;
+    }
+
+    header {
+      position: relative;
+      /* Context for torches */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
 
     .torch-right {
       right: 10%;
@@ -371,12 +384,11 @@
 <body>
 
   <header>
+    <img src="ANIMATED%20TORCH.webp" class="torch torch-left" alt="Torch">
     <img src="LOGO%20ANIMATION.webp" alt="Rip & Tile Logo" class="logo">
+    <img src="ANIMATED%20TORCH.webp" class="torch torch-right" alt="Torch">
     <p class="subtitle">BROWSER-BASED DOOM TEXTURE CONVERTER</p>
   </header>
-
-  <img src="ANIMATED%20TORCH.webp" class="torch torch-left" alt="Torch">
-  <img src="ANIMATED%20TORCH.webp" class="torch torch-right" alt="Torch">
 
   <main>
     <!-- Controls -->
