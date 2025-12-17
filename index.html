@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rip & Tile - Doom Texture Converter</title>
+  <link rel="icon" type="image/png" href="ICON.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap');
+
+    @font-face {
+      font-family: 'DoomCustom';
+      src: url('m42.TTF') format('truetype');
+    }
+
+    :root {
+      --bg-dark: #0f0f13;
+      --panel-bg: rgba(20, 20, 25, 0.85);
+      --accent: #ff4747;
+      /* Doom Red-ish */
+      --text-main: #ffffff;
+      --text-dim: #a0a0a0;
+      --border: rgba(255, 255, 255, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DoomCustom', 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      background-color: var(--bg-dark);
+      /* Fallback if image not found, but we keep the structure */
+      background-image: url("RED%20CLOUDS%20wallpaper.png");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 2rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      max-height: 195px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .controls-panel {
+      flex: 1;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 0.8rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: 0;
+    }
+
+    select,
+    input[type="file"] {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border);
+      color: white;
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    select:hover {
+      border-color: var(--accent);
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 3rem 1rem;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.05);
+      position: relative;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: 0;
+      font-size: 0.9rem;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(255, 71, 71, 0.15);
+    }
+
+    .button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: transform 0.1s, filter 0.2s;
+    }
+
+    .button:hover {
+      filter: brightness(1.2);
+    }
+
+    .button:active {
+      transform: scale(0.98);
+    }
+
+    .preview-panel {
+      flex: 2;
+      min-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      background: repeating-linear-gradient(45deg,
+          rgba(0, 0, 0, 0.2),
+          rgba(0, 0, 0, 0.2) 10px,
+          rgba(0, 0, 0, 0.3) 10px,
+          rgba(0, 0, 0, 0.3) 20px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    canvas {
+      max-width: 100%;
+      max-height: 60vh;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      image-rendering: pixelated;
+    }
+
+    #idleAnimation {
+      max-height: 250px;
+      width: auto;
+      object-fit: contain;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.3));
+    }
+
+    .file-info {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: 0;
+    }
+
+    .torch {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 400px;
+      /* Increased by ~33% */
+      width: auto;
+      pointer-events: none;
+      mix-blend-mode: normal;
+      filter: none;
+
+      /* Robust Luminance Masking (Stencil Luma) */
+      -webkit-mask-image: url('MASK.webp');
+      mask-image: url('MASK.webp');
+
+      -webkit-mask-size: contain;
+      mask-size: contain;
+
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+
+      -webkit-mask-position: center;
+      mask-position: center;
+
+      /* Luma mode: White = Opaque, Black = Transparent */
+      -webkit-mask-source-type: luminance;
+      mask-mode: luminance;
+    }
+
+    .torch-left {
+      left: 10%;
+    }
+
+    .torch-right {
+      right: 10%;
+    }
+
+    @media (max-width: 1200px) {
+      .torch {
+        display: none;
+        /* Hide on smaller screens to avoid overlap */
+      }
+    }
+
+    /* Final Clean Animation Settings - Override to ensure visibility */
+    .torch {
+      mix-blend-mode: normal !important;
+      -webkit-mask-image: none !important;
+      mask-image: none !important;
+      filter: none !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <img src="LOGO%20ANIMATION.webp" alt="Rip & Tile Logo" class="logo">
+  </header>
+
+  <img src="ANIMATED%20TORCH.webp" class="torch torch-left" alt="Torch">
+  <img src="ANIMATED%20TORCH.webp" class="torch torch-right" alt="Torch">
+
+  <main>
+    <!-- Controls -->
+    <section class="panel controls-panel">
+      <h2>Texture Settings</h2>
+
+      <div class="control-group">
+        <label>Asset Type</label>
+        <select id="assetType">
+          <option value="texture" selected>Wall/Flat Texture</option>
+          <option value="sprite">Sprite (Monster/Prop)</option>
+          <option value="weapon">Weapon/Hand (HuD)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Upload Image</label>
+        <div id="dropZone" class="drop-zone">
+          <p>Drag & Drop Image here<br>or Click to Browse</p>
+          <!-- Hidden input covering the zone for click -->
+          <input type="file" id="fileInput" accept="image/png, image/jpeg" style="display: none;">
+        </div>
+        <div id="fileInfo" class="file-info"></div>
+      </div>
+
+      <div class="control-group">
+        <label for="outputSize">Output Size</label>
+        <select id="outputSize">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="ditherMode">Dithering Mode</label>
+        <select id="ditherMode">
+          <option value="floyd" selected>Floyd-Steinberg (Recommended)</option>
+          <option value="bayer">Bayer 4x4 (Ordered)</option>
+          <option value="atkinson">Atkinson (High Contrast)</option>
+          <option value="none">None (Posterize)</option>
+        </select>
+      </div>
+
+      <button id="downloadBtn" class="button">DOWNLOAD</button>
+
+      <div class="instructions" style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+        <h3
+          style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">
+          How to Use</h3>
+        <ul
+          style="color: var(--text-dim); font-size: 0.8rem; padding-left: 1.2rem; font-family: 'Outfit', sans-serif; line-height: 1.4;">
+          <li>Select your <strong>Asset Type</strong> (Texture, Sprite, Weapon).</li>
+          <li>Drag & Drop any image to convert it.</li>
+          <li>Adjust <strong>Dithering</strong> to taste.</li>
+          <li><strong>Download</strong> and import directly into SLADE.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Preview -->
+    <section class="panel preview-panel">
+      <img id="idleAnimation" src="DEMON%20ANIMATION.webp" alt="Idle Demon">
+      <canvas id="previewCanvas" width="128" height="128"></canvas>
+      <p id="previewLabel" style="color: var(--text-dim); font-size: 0.9rem;">
+        HURT ME PLENTY
+      </p>
+    </section>
+  </main>
+
+  <script>
+    /******************************************
+     * DOOM PALETTE (PLAYPAL)
+     ******************************************/
+    const PLAYPAL = [
+      [0, 0, 0], [31, 23, 11], [23, 15, 7], [15, 7, 0], [7, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
+      [215, 191, 167], [199, 171, 143], [183, 151, 119], [171, 131, 95], [155, 115, 71], [139, 95, 47], [127, 75, 23], [111, 59, 0],
+      [255, 255, 255], [255, 255, 255], [239, 239, 239], [223, 223, 223], [207, 207, 207], [191, 191, 191], [175, 175, 175], [159, 159, 159],
+      [143, 143, 143], [127, 127, 127], [111, 111, 111], [95, 95, 95], [79, 79, 79], [63, 63, 63], [47, 47, 47], [31, 31, 31],
+      [255, 199, 199], [255, 171, 171], [255, 143, 143], [255, 115, 115], [255, 87, 87], [255, 59, 59], [255, 31, 31], [255, 0, 0],
+      [215, 0, 0], [183, 0, 0], [151, 0, 0], [119, 0, 0], [87, 0, 0], [59, 0, 0], [31, 0, 0], [0, 0, 0],
+      [255, 223, 199], [255, 207, 175], [255, 191, 151], [255, 175, 127], [255, 159, 103], [255, 143, 79], [255, 127, 55], [255, 111, 31],
+      [231, 95, 0], [207, 79, 0], [183, 67, 0], [159, 51, 0], [139, 43, 0], [115, 27, 0], [95, 23, 0], [71, 15, 0],
+      [255, 255, 171], [255, 247, 147], [255, 239, 123], [255, 231, 99], [255, 223, 75], [255, 219, 51], [255, 211, 27], [255, 203, 0],
+      [227, 179, 0], [199, 155, 0], [171, 131, 0], [143, 111, 0], [119, 91, 0], [91, 67, 0], [63, 47, 0], [39, 27, 0],
+      [159, 255, 159], [135, 255, 135], [111, 255, 111], [87, 255, 87], [63, 255, 63], [39, 255, 39], [15, 255, 15], [0, 247, 0],
+      [0, 215, 0], [0, 183, 0], [0, 151, 0], [0, 119, 0], [0, 87, 0], [0, 59, 0], [0, 31, 0], [0, 0, 0],
+      [159, 255, 255], [135, 243, 255], [111, 231, 255], [87, 219, 255], [63, 207, 255], [39, 191, 255], [15, 179, 255], [0, 163, 255],
+      [0, 147, 235], [0, 127, 203], [0, 111, 175], [0, 91, 147], [0, 75, 119], [0, 55, 91], [0, 39, 63], [0, 19, 39],
+      [159, 191, 255], [135, 171, 255], [111, 155, 255], [87, 139, 255], [63, 119, 255], [39, 103, 255], [15, 87, 255], [0, 71, 255],
+      [0, 59, 227], [0, 51, 199], [0, 43, 171], [0, 31, 143], [0, 23, 115], [0, 15, 87], [0, 7, 63], [0, 0, 39],
+      [215, 191, 255], [199, 171, 247], [183, 151, 239], [171, 131, 231], [155, 115, 223], [139, 95, 215], [127, 75, 207], [111, 59, 199],
+      [99, 47, 183], [87, 39, 167], [75, 27, 151], [63, 19, 135], [51, 11, 119], [39, 0, 103], [27, 0, 87], [15, 0, 71],
+      [255, 171, 255], [255, 147, 247], [255, 123, 239], [255, 99, 231], [255, 75, 223], [255, 51, 215], [255, 27, 207], [255, 0, 199],
+      [219, 0, 175], [187, 0, 147], [155, 0, 119], [123, 0, 95], [91, 0, 67], [59, 0, 43], [31, 0, 19], [0, 0, 0],
+      [255, 231, 215], [255, 219, 195], [255, 207, 175], [255, 195, 155], [255, 183, 135], [255, 171, 119], [255, 159, 99], [255, 147, 79],
+      [239, 131, 63], [223, 119, 47], [207, 103, 31], [191, 91, 19], [175, 79, 7], [159, 67, 0], [143, 55, 0], [127, 43, 0],
+      [215, 215, 199], [203, 195, 175], [187, 179, 155], [175, 163, 135], [159, 147, 115], [147, 135, 99], [135, 119, 83], [119, 107, 67],
+      [107, 95, 51], [95, 83, 35], [83, 71, 23], [71, 59, 11], [59, 47, 0], [47, 39, 0], [35, 27, 0], [23, 19, 0],
+      [171, 147, 131], [151, 127, 111], [135, 111, 95], [119, 95, 79], [103, 79, 63], [87, 67, 51], [71, 55, 39], [55, 43, 27],
+      [119, 75, 63], [107, 59, 47], [95, 47, 31], [83, 35, 19], [71, 23, 7], [59, 15, 0], [47, 7, 0], [35, 0, 0],
+      [231, 183, 171], [219, 163, 151], [207, 143, 131], [191, 127, 107], [179, 107, 87], [163, 91, 67], [151, 75, 47], [135, 59, 27],
+      [123, 47, 15], [107, 35, 0], [91, 23, 0], [79, 15, 0], [63, 7, 0], [47, 0, 0], [31, 0, 0], [15, 0, 0],
+      [255, 255, 255], [255, 219, 219], [255, 187, 187], [255, 155, 155], [255, 119, 119], [255, 87, 87], [255, 55, 55], [255, 23, 23]
+    ];
+
+    function findNearestColor(r, g, b) {
+      let minDist = Infinity;
+      let nearestIndex = -1;
+
+      for (let i = 0; i < PLAYPAL.length; i++) {
+        const [pr, pg, pb] = PLAYPAL[i];
+        const dist = (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2;
+        if (dist < minDist) {
+          minDist = dist;
+          nearestIndex = i;
+        }
+      }
+      return nearestIndex;
+    }
+
+    function getColor(index) {
+      return PLAYPAL[index] || [0, 0, 0];
+    }
+
+    /******************************************
+     * PROCESSOR (Resizing/Dithering)
+     ******************************************/
+    function resizeImage(img, width, height) {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      // High quality resize
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, width, height);
+      return canvas;
+    }
+
+    function applyDithering(canvas, algorithm = 'none', useTransparency = false) {
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+
+      if (algorithm === 'floyd') {
+        floydSteinberg(data, width, height, useTransparency);
+      } else if (algorithm === 'bayer') {
+        bayerDither(data, width, height, useTransparency);
+      } else if (algorithm === 'atkinson') {
+        atkinsonDither(data, width, height, useTransparency);
+      } else {
+        noDither(data, width, height, useTransparency);
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      return canvas;
+    }
+
+    function noDither(data, width, height, useTransparency) {
+      for (let i = 0; i < data.length; i += 4) {
+        const alpha = data[i + 3];
+        if (useTransparency && alpha < 128) {
+          data[i] = 0; data[i + 1] = 0; data[i + 2] = 0; data[i + 3] = 0;
+          continue;
+        }
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const nearestIdx = findNearestColor(r, g, b);
+        const [nr, ng, nb] = getColor(nearestIdx);
+        data[i] = nr;
+        data[i + 1] = ng;
+        data[i + 2] = nb;
+        data[i + 3] = 255;
+      }
+    }
+
+    function floydSteinberg(data, width, height, useTransparency) {
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const idx = (y * width + x) * 4;
+          // Boundary checks are implicit in array access but good to be safe if implementing strictly
+          if (idx >= data.length) continue;
+
+          const alpha = data[idx + 3];
+          if (useTransparency && alpha < 128) {
+            data[idx] = 0; data[idx + 1] = 0; data[idx + 2] = 0; data[idx + 3] = 0;
+            continue;
+          }
+
+          const oldR = data[idx];
+          const oldG = data[idx + 1];
+          const oldB = data[idx + 2];
+
+          const nearestIdx = findNearestColor(oldR, oldG, oldB);
+          const [newR, newG, newB] = getColor(nearestIdx);
+
+          data[idx] = newR;
+          data[idx + 1] = newG;
+          data[idx + 2] = newB;
+          data[idx + 3] = 255;
+
+          const errR = oldR - newR;
+          const errG = oldG - newG;
+          const errB = oldB - newB;
+
+          // Distribute
+          const distribute = (offset, factor) => {
+            const nIdx = idx + offset;
+            if (nIdx < data.length) {
+              // We don't check if neighbor is transparent here, simpler. 
+              // Any error pushed to a transparent pixel will just be ignored when we process that pixel next.
+              data[nIdx] = Math.min(255, Math.max(0, data[nIdx] + errR * factor));
+              data[nIdx + 1] = Math.min(255, Math.max(0, data[nIdx + 1] + errG * factor));
+              data[nIdx + 2] = Math.min(255, Math.max(0, data[nIdx + 2] + errB * factor));
+            }
+          };
+
+          // Right (+1 pixel = +4 bytes)
+          // Bottom Right
+          if (x + 1 < width && y + 1 < height) distribute((width + 1) * 4, 1 / 16);
+        }
+      }
+    }
+
+    function bayerDither(data, width, height, useTransparency) {
+      // 4x4 Bayer Matrix
+      const bayerMap = [
+        [1, 9, 3, 11],
+        [13, 5, 15, 7],
+        [4, 12, 2, 10],
+        [16, 8, 14, 6]
+      ];
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const idx = (y * width + x) * 4;
+
+          const alpha = data[idx + 3];
+          if (useTransparency && alpha < 128) {
+            data[idx] = 0; data[idx + 1] = 0; data[idx + 2] = 0; data[idx + 3] = 0;
+            continue;
+          }
+
+          // Normalized threshold from 0 to 1 based on map (1-16) then centered around 0
+          // Value range in map is 1..16. We center it: (v - 8.5)
+          const mapValue = bayerMap[y % 4][x % 4];
+          const threshold = (mapValue - 8.5) * 8; // Scale factor adjusts strength
+
+          const oldR = Math.min(255, Math.max(0, data[idx] + threshold));
+          const oldG = Math.min(255, Math.max(0, data[idx + 1] + threshold));
+          const oldB = Math.min(255, Math.max(0, data[idx + 2] + threshold));
+
+          const nearestIdx = findNearestColor(oldR, oldG, oldB);
+          const [newR, newG, newB] = getColor(nearestIdx);
+
+          data[idx] = newR;
+          data[idx + 1] = newG;
+          data[idx + 2] = newB;
+          data[idx + 3] = 255;
+        }
+      }
+    }
+
+    function atkinsonDither(data, width, height, useTransparency) {
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const idx = (y * width + x) * 4;
+
+          const alpha = data[idx + 3];
+          if (useTransparency && alpha < 128) {
+            data[idx] = 0; data[idx + 1] = 0; data[idx + 2] = 0; data[idx + 3] = 0;
+            continue;
+          }
+
+          const oldR = data[idx];
+          const oldG = data[idx + 1];
+          const oldB = data[idx + 2];
+
+          const nearestIdx = findNearestColor(oldR, oldG, oldB);
+          const [newR, newG, newB] = getColor(nearestIdx);
+
+          data[idx] = newR;
+          data[idx + 1] = newG;
+          data[idx + 2] = newB;
+          data[idx + 3] = 255;
+
+          const errR = oldR - newR;
+          const errG = oldG - newG;
+          const errB = oldB - newB;
+
+          const distribute = (offset, factor) => {
+            const nIdx = idx + offset;
+            if (nIdx < data.length) {
+              data[nIdx] = Math.min(255, Math.max(0, data[nIdx] + errR * factor));
+              data[nIdx + 1] = Math.min(255, Math.max(0, data[nIdx + 1] + errG * factor));
+              data[nIdx + 2] = Math.min(255, Math.max(0, data[nIdx + 2] + errB * factor));
+            }
+          };
+
+          // Atkinson Distribution (1/8 to neighbors)
+          if (x + 1 < width) distribute(4, 1 / 8);
+          if (x + 2 < width) distribute(8, 1 / 8);
+          if (x - 1 >= 0 && y + 1 < height) distribute((width - 1) * 4, 1 / 8);
+          if (y + 1 < height) distribute(width * 4, 1 / 8);
+          if (x + 1 < width && y + 1 < height) distribute((width + 1) * 4, 1 / 8);
+          if (y + 2 < height) distribute(width * 8, 1 / 8);
+        }
+      }
+    }
+
+    /******************************************
+     * MAIN UI LOGIC
+     ******************************************/
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const assetTypeSelect = document.getElementById('assetType');
+    const outputSizeSelect = document.getElementById('outputSize');
+    const ditherModeSelect = document.getElementById('ditherMode');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const previewCanvas = document.getElementById('previewCanvas');
+    // Initially hide canvas until loaded, show demon instead
+    previewCanvas.style.display = 'none';
+    const previewLabel = document.getElementById('previewLabel');
+    const fileInfo = document.getElementById('fileInfo');
+
+    let currentImage = null;
+
+    const SIZE_OPTIONS = {
+      texture: [
+        { value: '64x128', label: 'Wall Small (64x128)' },
+        { value: '128x128', label: 'Wall Standard (128x128)' },
+        { value: '256x128', label: 'Wall Wide (256x128)' },
+        { value: '64x64', label: 'Flat (Floor/Ceiling) (64x64)' },
+        { value: 'custom', label: 'Custom (Maintain Aspect)' }
+      ],
+      sprite: [
+        { value: 'custom', label: 'Custom (Maintain Aspect)' },
+        { value: 'maxh128', label: 'Max Height 128' },
+        { value: 'maxh256', label: 'Max Height 256' }
+      ],
+      weapon: [
+        { value: 'custom', label: 'Custom (Maintain Aspect)' },
+        { value: 'screen', label: 'Screen Fit (Width 320)' }
+      ]
+    };
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    assetTypeSelect.addEventListener('change', () => {
+      updateSizeOptions();
+      processImage();
+    });
+
+    outputSizeSelect.addEventListener('change', processImage);
+    ditherModeSelect.addEventListener('change', processImage);
+
+    downloadBtn.addEventListener('click', () => {
+      if (!currentImage) return;
+      const link = document.createElement('a');
+      link.download = `doom_${assetTypeSelect.value}_texture.png`;
+      link.href = previewCanvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // Init
+    updateSizeOptions();
+
+    function updateSizeOptions() {
+      const type = assetTypeSelect.value;
+      const options = SIZE_OPTIONS[type];
+      outputSizeSelect.innerHTML = '';
+      options.forEach(opt => {
+        const el = document.createElement('option');
+        el.value = opt.value;
+        el.textContent = opt.label;
+        outputSizeSelect.appendChild(el);
+      });
+      outputSizeSelect.value = options[0].value;
+    }
+
+    function handleFile(file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file (PNG or JPG).');
+        return;
+      }
+      fileInfo.textContent = `File: ${file.name}`;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          currentImage = img;
+          processImage();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function processImage() {
+      if (!currentImage) return;
+
+      const sizeVal = outputSizeSelect.value;
+      const assetType = assetTypeSelect.value;
+      let targetWidth, targetHeight;
+
+      if (sizeVal === 'custom') {
+        targetWidth = currentImage.width;
+        targetHeight = currentImage.height;
+      } else if (sizeVal.startsWith('maxh')) {
+        const maxH = parseInt(sizeVal.replace('maxh', ''));
+        if (currentImage.height > maxH) {
+          const ratio = maxH / currentImage.height;
+          targetHeight = maxH;
+          targetWidth = Math.round(currentImage.width * ratio);
+        } else {
+          targetWidth = currentImage.width;
+          targetHeight = currentImage.height;
+        }
+      } else if (sizeVal === 'screen') {
+        const ratio = 320 / currentImage.width;
+        targetWidth = 320;
+        targetHeight = Math.round(currentImage.height * ratio);
+      } else {
+        [targetWidth, targetHeight] = sizeVal.split('x').map(Number);
+      }
+
+      const resizedCanvas = resizeImage(currentImage, targetWidth, targetHeight);
+      const useTransparency = assetType !== 'texture';
+      const processedCanvas = applyDithering(resizedCanvas, ditherModeSelect.value, useTransparency);
+
+      // Hide idle animation
+      document.getElementById('idleAnimation').style.display = 'none';
+      previewCanvas.style.display = 'block';
+
+      previewCanvas.width = targetWidth;
+      previewCanvas.height = targetHeight;
+      const ctx = previewCanvas.getContext('2d');
+      ctx.clearRect(0, 0, targetWidth, targetHeight);
+      ctx.drawImage(processedCanvas, 0, 0);
+
+      previewLabel.textContent = `${targetWidth}x${targetHeight} | Doom Palette | ${useTransparency ? 'Alpha Preserved' : 'Opaque'}`;
+    }
+  </script>
+</body>
+
+</html>
