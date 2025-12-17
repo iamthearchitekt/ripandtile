@@ -38,10 +38,13 @@
       background-color: var(--bg-dark);
       /* Fallback if image not found, but we keep the structure */
       background-image: url("RED%20CLOUDS%20wallpaper.png");
-      background-size: cover;
+      background-size: 100% auto;
+      /* Force width match, let height grow */
       background-position: top center;
-      background-attachment: fixed;
-      background-repeat: no-repeat;
+      background-attachment: scroll;
+      /* Scrolls WITH the content */
+      background-repeat: repeat-y;
+      /* Repeat vertically if content is long */
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
