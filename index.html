@@ -58,8 +58,17 @@
 
     .logo {
       max-height: 255px;
+      max-width: 90%;
+      height: auto;
       object-fit: contain;
       filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+      transition: max-height 0.3s ease;
+    }
+
+    @media (max-width: 600px) {
+      .logo {
+        max-height: 150px;
+      }
     }
 
     .subtitle {
@@ -253,6 +262,8 @@
       pointer-events: none;
       mix-blend-mode: normal;
       filter: none;
+      z-index: -1;
+      /* Ensure they stay behind the main content */
 
       /* Robust Luminance Masking (Stencil Luma) */
       -webkit-mask-image: url('MASK.webp');
